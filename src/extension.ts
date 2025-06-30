@@ -23,6 +23,7 @@ import { FolderEvent, FolderOperation, WorkspaceContext } from "./WorkspaceConte
 import { FolderContext } from "./FolderContext";
 import { TestExplorer } from "./TestExplorer/TestExplorer";
 import { LanguageStatusItems } from "./ui/LanguageStatusItems";
+import { SwiftVersionStatusItem } from "./ui/StatusItem";
 import { getErrorDescription } from "./utilities/utilities";
 import { Version } from "./utilities/version";
 import { getReadOnlyDocumentProvider } from "./ui/ReadOnlyDocumentProvider";
@@ -106,6 +107,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<Api> {
 
         // Register the language status bar items.
         context.subscriptions.push(new LanguageStatusItems(workspaceContext));
+
+        // Register the Swift version status bar item.
+        const swiftVersionStatusItem = new SwiftVersionStatusItem();
+        swiftVersionStatusItem.setToolchain(toolchain);
+        context.subscriptions.push(swiftVersionStatusItem);
 
         // swift module document provider
         context.subscriptions.push(getReadOnlyDocumentProvider());

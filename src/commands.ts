@@ -73,6 +73,13 @@ export function registerToolchainCommands(
         vscode.commands.registerCommand("swift.pickProcess", configuration =>
             pickProcess(configuration)
         ),
+        vscode.commands.registerCommand("swift.showSwiftVersion", () => {
+            if (toolchain) {
+                vscode.window.showInformationMessage(
+                    `Swift Version: ${toolchain.swiftVersionString}`
+                );
+            }
+        }),
     ];
 }
 

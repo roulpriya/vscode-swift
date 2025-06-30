@@ -13,6 +13,7 @@
 //===----------------------------------------------------------------------===//
 
 import * as vscode from "vscode";
+import { SwiftToolchain } from "../toolchain/toolchain";
 
 export class RunningTask {
     constructor(public task: vscode.Task | string) {}
@@ -22,6 +23,57 @@ export class RunningTask {
         } else {
             return this.task;
         }
+    }
+}
+
+export class SwiftVersionStatusItem {
+    private item: vscode.StatusBarItem;
+    private toolchain?: SwiftToolchain;
+
+    constructor() {
+        this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+        this.item.command = "swift.showSwiftVersion";
+        this.setupActiveEditorWatcher();
+    }
+
+    setToolchain(toolchain: SwiftToolchain) {
+        this.toolchain = toolchain;
+        this.updateStatusItem();
+    }
+
+    private setupActiveEditorWatcher() {
+        vscode.window.onDidChangeActiveTextEditor(editor => {
+            this.updateStatusItem();
+        });
+    }
+
+    private updateStatusItem() {
+        const activeEditor = vscode.window.activeTextEditor;
+        if (activeEditor && this.isSwiftFile(activeEditor.document) && this.toolchain) {
+            this.show();
+        } else {
+            this.hide();
+        }
+    }
+
+    private isSwiftFile(document: vscode.TextDocument): boolean {
+        return document.languageId === "swift";
+    }
+
+    private show() {
+        if (this.toolchain) {
+            this.item.text = `$(gear) Swift ${this.toolchain.swiftVersion.toString()}`;
+            this.item.tooltip = `Swift Version: ${this.toolchain.swiftVersionString}`;
+            this.item.show();
+        }
+    }
+
+    private hide() {
+        this.item.hide();
+    }
+
+    dispose() {
+        this.item.dispose();
     }
 }
 
